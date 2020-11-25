@@ -31,7 +31,9 @@ function dataFromTIFFtoArray(_img,  _pntsFromTIFF, _scale) {
 // and calls the function display(...) from each object
 function visualizeDataFromTIFF(_pntsFromTIFF, _visFlag, _c){
   _pntsFromTIFF.forEach(element => {
+    //if(user.dist(element)<55){
       element.display(_visFlag,_c)
+    //}
   })
 }
 // a class to store each Pixel as data point

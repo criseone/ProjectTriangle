@@ -1,3 +1,6 @@
+
+TIM EDIT V2
+
 # Table Framework for Bits & Atoms III (Data Literacy & Visualization) and Interactive Visualization Course
 
 This is a node.js server framework using socket.io and including a P5 JS implementation on the client side

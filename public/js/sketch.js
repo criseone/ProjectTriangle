@@ -31,11 +31,18 @@ let myFont
 let tableControl
 let bckColor = [0,0,0]
 
+//projectriangle start
+
+let china
+
+//projectriangle end
+
+
 let zurich
 let cdmx
 // apply rotations of the textured sphere for accurate UV projection of the earth map
 let rMX =  -90/* -90 */
-let rMY =  90/* 90 */
+let rMY =  100/* 90 */
 let rMZ =  0
 
 let easycamIntialized=false
@@ -60,8 +67,8 @@ let refrst
 let pntsFromTIFF_co2  = []
 let pntsFromTIFF_refrst = []
 
-let flagCO2Data = true
-let flagRfrsData = true
+let flagCO2Data = false
+let flagRfrsData = false
 
 let flagDataVisStyleCO2 = false
 let flagDataVisStyleRfrst = true
@@ -154,8 +161,8 @@ function getRandomColor(){
 
 
 function preload() {
-  	earthImg = loadImage('../imgs/earth_min_black.jpg') 
-	sky = loadImage('../imgs/sky.jpg') 
+  	earthImg = loadImage('../imgs/earth_3biggest-01.png')
+	sky = loadImage('../imgs/space2.jpg') 
 	earthMap = loadTable('assets/maps/earth.csv','','')
 	loadData('assets/data/future_cities.csv')
 	// loading images containing simplified data from the geoTIFF
@@ -261,6 +268,19 @@ function setup() {
 	// y = R * cos(lat) * sin(lon)
 	// z = R *sin(lat)
 
+	//projectriangle start
+
+	let latCN = radians(35.86166)
+	let lonCN = radians(104.195397)
+
+	china = createVector(0,0,0)
+	china.x = r * Math.cos(latCN) * Math.cos(lonCN)
+	china.y =  r * Math.cos(latCN) * Math.sin(lonCN)
+	china.z = r * Math.sin(latCN)
+
+	//projectriangle end
+
+
 
 	zurich = createVector(0,0,0)
 	zurich.x = r * Math.cos(latZ) * Math.cos(lonZ )
@@ -308,18 +328,27 @@ function draw() {
 	show2d() 
 	showPointsOfInterest(cities.length-2)
 	showFlatMap(pointsEarth, color(0,255,0))
-	showVectorMap(pointsEarth,screenPointsEarth,color(255,255,255))
+	showVectorMap(pointsEarth,screenPointsEarth,color(255,0,255))
 	easycam.setCenter([0,0,0],0.0)
 
 	// here we call the function visualize and pass the desired arraylist
 	// which will iterate through each data point and visualize it
 	// the flag is a boolean to display or hide the visualization
+	
+	//change for triangle project
+
 	if(flagCO2Data){
 		visualizeDataFromTIFF(pntsFromTIFF_co2,flagDataVisStyleCO2, color(255,0,0))
 	}
 	if(flagRfrsData){
 		visualizeDataFromTIFF(pntsFromTIFF_refrst,flagDataVisStyleRfrst, color(0,255,100))
 	}
+}
+
+function showNewmap(){
+
+
+
 }
 
 function showFlatPointsOfInterest(){
@@ -350,15 +379,15 @@ function show3D(){
 	  	rotateX(radians(rMX)) 
 	  	rotateY(radians(rMY))
 	  	rotateZ(radians(rMZ))
-	  	// fill(0,0,100)
+	  	//fill(100,100,100)
 	  	// drawing EARTH Polygon
 	  	sphere(r,20,20)
 	  	pop()
 		noLights() 
 	 	ambientLight(255, 255, 255) 
-	  	// texture(sky) 
+	  	texture(sky) 
 	  	noStroke() 
-	  	fill(30,30,30)
+	  	//fill(30,30,30)
 		sphere(r*5,6,6);
 
 
@@ -403,6 +432,31 @@ function keyTyped(){
 	if(key === 'l' || key === 'L'){
 		flagDataVisStyleRfrst = !flagDataVisStyleRfrst
 	}
+	if (key === 'w') {
+		rMX++
+		console.log(rMX)
+	}
+	if (key === 's') {
+		rMX--
+		console.log(rMX)
+	}
+	if (key === 'a') {
+		rMY++
+		console.log(rMY)
+	}
+	if (key === 'd') {
+		rMY--
+		console.log(rMY)
+	}
+	if (key === 'q') {
+		rMZ++
+		console.log(rMZ)
+	}
+	if (key === 'e') {
+		rMZ--
+		console.log(rMZ)
+	}
+
 }
 function windowResized() {
   	resizeCanvas(windowWidth, windowHeight,true)
@@ -422,7 +476,7 @@ function listenMessages(){
 		thisDevice.y = data.y * windowHeight
 		thisDevice.rotation = data.rot
 		trackedDevices.push(thisDevice)
-		createHTML(data.id)
+		//createHTML(data.id)
 	}) 
 	socket.on('updateDevice', function(data){
 		let id = data.id 
@@ -487,49 +541,95 @@ function show2d() {
 		trackedDevices.forEach(element =>{
 			if(element.inRange){
 				element.show()	
-				fill(200,0,0)
-				ellipse(element.smoothPosition.x + 100, element.smoothPosition.y+100, 20,20)
+				//fill(200,0,0)
+				//ellipse(element.smoothPosition.x + 100, element.smoothPosition.y+100, 20,20)
 				// if(elemnt.uniqueId == 52){ /* example of a loop accessing an specific uniqueId  to do something specific */}
 				// access the identifier : element.identifier // changes everytime you add or create a new object on screen
 				// access the uniqueId : element.uniqueId // stays the same always for each tracked object
-				text(element.uniqueId, element.smoothPosition.x + 120, element.smoothPosition.y + 120)
+				//text(element.uniqueId, element.smoothPosition.x + 120, element.smoothPosition.y + 120)
 			}
-			updateHTML(element.smoothPosition.x, element.smoothPosition.x,element.uniqueId)
+			//updateHTML(element.smoothPosition.x, element.smoothPosition.y,element.uniqueId, element.rotation)
 		})
 	}
 	easycam.endHUD()
 }
 
 // this function creates an HTML div element assigns the class trackedDivs to it, passes the uniqueId as id and adds some text inside
+//function createHTML(id){
+//	let testDiv = document.createElement("div")   // creating a new div
+//	testDiv.className = "trackedDivs"
+//	testDiv.innerHTML = "I'm a new div"
+//	testDiv.id = id           
+//	document.body.appendChild(testDiv)
+//}
+//// this function update the position and labesl of the tracked devices
+//function updateHTML(x_pos, y_pos,tracked_id){
+//	let trackedDivs = document.getElementsByClassName("trackedDivs")
+//	Array.prototype.forEach.call(trackedDivs, function(element) {
+//		if(element.id == tracked_id){
+//			element.style.left = x_pos+'px';
+//			element.style.top = y_pos+'px';
+//		}
+//	})
+//}
+
+//pixelProject Start
+
 function createHTML(id){
 	let testDiv = document.createElement("div")   // creating a new div
-	testDiv.className = "trackedDivs"
-	testDiv.innerHTML = "I'm a new div"
-	testDiv.id = id           
+	testDiv.className = "pixelProject"
+	//testDiv.innerHTML = "pixelProject"
+	testDiv.id = id
 	document.body.appendChild(testDiv)
 }
 // this function update the position and labesl of the tracked devices
-function updateHTML(x_pos, y_pos,tracked_id){
-	let trackedDivs = document.getElementsByClassName("trackedDivs")
-	Array.prototype.forEach.call(trackedDivs, function(element) {
+function updateHTML(x_pos, y_pos,tracked_id, rot){
+	let pixelProject = document.getElementsByClassName("pixelProject")
+	//let lastRotation = 0
+
+	Array.prototype.forEach.call(pixelProject, function(element) {
 		if(element.id == tracked_id){
-			element.style.left = x_pos+'px';
-			element.style.top = y_pos+'px';
+			element.style.left = x_pos-150+'px';
+			element.style.top = y_pos-150+'px';
+			if(rot > 0 && rot < 180){
+				element.style.opacity = rot/180;
+				}
+			else{
+				element.style.opacity = 0
+			}
+			//lastRotation = rot
 		}
 	})
 }
+
+
 // this function destroys the html elements which are not used anymore, to avoid accumulating appended children
 function destroyHTML(tracked_id){
 
 	// should remove the HTML elements from past tracked devices that are not in use any more
-	let trackedDivs = document.getElementsByClassName("trackedDivs")
-	Array.prototype.forEach.call(trackedDivs, function(element) {
+	let pixelProject = document.getElementsByClassName("pixelProject")
+	Array.prototype.forEach.call(pixelProject, function(element) {
 		if(element.id == tracked_id){
 			// search for a function to actually remove an element from HTML
 			element.remove()
 		}
 	})
 }
+
+//pixelProject End
+
+
+//function destroyHTML(tracked_id){
+//
+//	// should remove the HTML elements from past tracked devices that are not in use any more
+//	let trackedDivs = document.getElementsByClassName("trackedDivs")
+//	Array.prototype.forEach.call(trackedDivs, function(element) {
+//		if(element.id == tracked_id){
+//			// search for a function to actually remove an element from HTML
+//			element.remove()
+//		}
+//	})
+//}
 
 
 function setMap(map, mapPoints, screenMapPoints){
@@ -657,6 +757,7 @@ function fastDist(  ax, ay,  az, bx, by, bz )
 }
 // rename this function - show Points Of Interest
 function showPointsOfInterest(amount){
+	let tChina = screenPosition(-china.x,china.y,china.z)
 	if(pOIFlag){
 		let testPoints = []
 		// the screenPoisition() function projects coordinates from 3D space into the 2D projections of the Screen
@@ -692,6 +793,7 @@ function showPointsOfInterest(amount){
 			}
 			fill(255,100,100)
 			if(user.dist(tZurich)<25){
+			//if(trackedDevices.forEach.rotation > 360 && trackedDevices.forEach.rotation < 275){
 				let lat = Math.asin(zurich.z / r)
 				let lon = Math.atan2(zurich.y,zurich.x)
 				lat = lat * 180 / PI
@@ -707,6 +809,34 @@ function showPointsOfInterest(amount){
 			}else{
 				circle(tZurich.x + windowWidth/2,tZurich.y + windowHeight/2,15)
 			}
+			//projecttriangle start
+			fill(255,100,100)
+			//if(user.dist(tChina)<25){
+			trackedDevices.forEach(element =>{
+				//console.log(element.uniqueId, element.rotation)
+					if(element.rotation < 85 || element.rotation > 95){
+				let lat = Math.asin(china.z / r)
+				let lon = Math.atan2(china.y,china.x)
+				lat = lat * 180 / PI
+				lon = lon * 180 / PI
+				//textSize(16)
+				//let latLon = 'CHINA, LAT : ' + lat.toFixed(3) + ' , LON : '+ lon.toFixed(3) + ' , Z pos : ' + tChina.z
+				//if(mouseX>windowWidth/2){
+				//	text( latLon ,tChina.x + windowWidth/2 - 240, tChina.y + windowHeight/2 + 25 )
+				//}else{
+				//	text( latLon ,tChina.x + windowWidth/2 + 20, tChina.y + windowHeight/2 + 25 )
+				//}
+				push()
+				translate(tChina.x + windowWidth/2,tChina.y + windowHeight/2,tChina.z)
+				//circle(tChina.x + windowWidth/2,tChina.y + windowHeight/2,151.5)
+				fill(66,155,173)
+				circle(0,0, 151.5)
+				pop()
+			}else{
+				circle(tChina.x + windowWidth/2,tChina.y + windowHeight/2,15)
+			}
+		})
+			//projecttriangle end
 			fill(100,100,255)
 			circle(tCDMX.x + windowWidth/2,tCDMX.y + windowHeight/2,5)
 		// popMatrix()
